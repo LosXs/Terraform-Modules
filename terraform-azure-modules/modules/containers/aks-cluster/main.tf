@@ -1,1 +1,49 @@
-# Scaffold only — no resources in v0.1. See docs/README.md.
+resource "azurerm_kubernetes_cluster" "this" {
+  name                = var.name
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  dns_prefix          = var.dns_prefix
+  kubernetes_version  = var.kubernetes_version
+  tags                = local.common_tags
+
+  default_node_pool {
+    name       = "default"
+    node_count = var.node_count
+    vm_size    = var.vm_size
+  }
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  network_profile {
+    network_plugin = var.network_plugin
+  }
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
+}
+
+resource "azurerm_monitor_diagnostic_setting" "this" {
+  count = var.diagnostics_settings != null ? 1 : 0
+
+  name                       = coalesce(try(var.diagnostics_settings.name, null), "${var.name}-diag")
+  target_resource_id         = azurerm_kubernetes_cluster.this.id
+  log_analytics_workspace_id = var.diagnostics_settings.log_analytics_workspace_id
+
+  dynamic "enabled_log" {
+    for_each = var.diagnostics_settings != null && var.diagnostics_settings.logs_enabled ? toset(["allLogs"]) : toset([])
+    content {
+      category_group = enabled_log.value
+    }
+  }
+
+  dynamic "metric" {
+    for_each = var.diagnostics_settings != null && var.diagnostics_settings.metrics_enabled ? [1] : []
+    content {
+      category = "AllMetrics"
+      enabled  = true
+    }
+  }
+}

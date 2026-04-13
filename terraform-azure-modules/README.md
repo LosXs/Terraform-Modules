@@ -15,27 +15,43 @@ module "tags" {
 | **Implemented** | `modules/_shared/tags` | Mandatory tag validation and outputs |
 | **Implemented** | `modules/_shared/naming` | CAF-style names and truncation |
 | **Implemented** | `modules/governance/resource-group` | Resource group |
+| **Implemented** | `modules/governance/management-group` | Management group hierarchy |
+| **Implemented** | `modules/governance/policy-assignment` | Resource group policy assignment |
 | **Implemented** | `modules/monitoring/log-analytics-workspace` | Log Analytics workspace |
 | **Implemented** | `modules/monitoring/diagnostic-setting` | Diagnostic settings wrapper |
+| **Implemented** | `modules/monitoring/action-group` | Monitor action group |
+| **Implemented** | `modules/monitoring/monitor-alert` | Metric alert |
 | **Implemented** | `modules/identity-security/key-vault` | Key Vault (RBAC by default) |
 | **Implemented** | `modules/identity-security/key-vault-secret` | Key Vault secret |
+| **Implemented** | `modules/identity-security/key-vault-key` | Key Vault key |
+| **Implemented** | `modules/identity-security/user-assigned-identity` | User-assigned managed identity |
 | **Implemented** | `modules/identity-security/role-assignment` | Azure RBAC role assignment |
 | **Implemented** | `modules/networking/virtual-network` | Virtual network |
 | **Implemented** | `modules/networking/subnet` | Subnet |
 | **Implemented** | `modules/networking/network-security-group` | NSG with inline rules |
 | **Implemented** | `modules/networking/route-table` | Route table with UDRs |
-| Scaffold | `modules/governance/management-group` | Planned |
-| Scaffold | `modules/governance/policy-assignment` | Planned |
-| Scaffold | `modules/networking/private-endpoint`, `private-dns-zone` | Planned |
-| Scaffold | `modules/compute/*` | Planned |
-| Scaffold | `modules/storage/*` | Planned |
-| Scaffold | `modules/database/*` | Planned |
-| Scaffold | `modules/identity-security/key-vault-key`, `user-assigned-identity` | Planned |
-| Scaffold | `modules/monitoring/action-group`, `monitor-alert` | Planned |
-| Scaffold | `modules/app-services/*` | Planned |
-| Scaffold | `modules/containers/*` | Planned |
+| **Implemented** | `modules/networking/private-endpoint` | Private endpoint |
+| **Implemented** | `modules/networking/private-dns-zone` | Private DNS zone |
+| **Implemented** | `modules/storage/storage-account` | Storage account |
+| **Implemented** | `modules/storage/file-share` | Azure Files share |
+| **Implemented** | `modules/database/mssql-server` | Azure SQL server |
+| **Implemented** | `modules/database/mssql-database` | Azure SQL database |
+| **Implemented** | `modules/database/postgresql-flexible-server` | PostgreSQL flexible server |
+| **Implemented** | `modules/database/cosmosdb` | Cosmos DB account |
+| **Implemented** | `modules/compute/virtual-machine` | Linux VM + NIC |
+| **Implemented** | `modules/compute/virtual-machine-scale-set` | Linux VMSS |
+| **Implemented** | `modules/compute/azure-virtual-desktop` | AVD host pool |
+| **Implemented** | `modules/app-services/app-service-plan` | App Service plan (`azurerm_service_plan`) |
+| **Implemented** | `modules/app-services/linux-web-app` | Linux Web App |
+| **Implemented** | `modules/app-services/windows-web-app` | Windows Web App |
+| **Implemented** | `modules/app-services/function-app` | Linux function app |
+| **Implemented** | `modules/containers/container-registry` | Azure Container Registry |
+| **Implemented** | `modules/containers/aks-cluster` | AKS |
+| **Implemented** | `modules/containers/container-app-environment` | Container Apps environment |
+| **Implemented** | `modules/containers/container-app` | Container app |
+| **Implemented** | `modules/containers/container-app-job` | Container app job |
 
-Each module’s `docs/README.md` follows a standard layout (overview, Mermaid, usage, variables, outputs, policy, naming, versioning, limitations).
+Each module’s `docs/README.md` follows a standard layout (overview, Mermaid, usage, variables, outputs, policy, naming where relevant, versioning, limitations).
 
 ## Examples
 
@@ -72,7 +88,7 @@ terraform validate
 
 Install [TFLint](https://github.com/terraform-linters/tflint) and [tfsec](https://github.com/aquasecurity/tfsec) locally, then run `tflint --init`, `tflint`, and `tfsec .` as needed. [pre-commit](https://pre-commit.com/) hooks are defined in `.pre-commit-config.yaml`.
 
-## Module dependency graph (v0.1 + roadmap)
+## Module dependency graph (overview)
 
 ```mermaid
 graph TD
@@ -87,37 +103,28 @@ graph TD
     PA[policy-assignment]
   end
 
-  subgraph Monitoring_v01[Monitoring — implemented v0.1]
+  subgraph Monitoring
     LAW[log-analytics-workspace]
     DIAG[diagnostic-setting]
-  end
-
-  subgraph Monitoring_future[Monitoring — scaffold]
     AG[action-group]
     MA[monitor-alert]
   end
 
-  subgraph Networking_impl[Networking — implemented]
+  subgraph Networking
     VNET[virtual-network]
     SNET[subnet]
     NSG[network-security-group]
     RT[route-table]
-  end
-
-  subgraph Networking_future[Networking — scaffold]
     PE[private-endpoint]
     PDNS[private-dns-zone]
   end
 
-  subgraph Security_impl[Identity — implemented]
+  subgraph Identity
     KV[key-vault]
     KVS[key-vault-secret]
-    RBAC[role-assignment]
-  end
-
-  subgraph Security_future[Identity — scaffold]
-    UAI[user-assigned-identity]
     KVK[key-vault-key]
+    UAI[user-assigned-identity]
+    RBAC[role-assignment]
   end
 
   TAGS --> RG
@@ -129,12 +136,12 @@ graph TD
   SNET --> NSG
   RG --> RT
   DIAG -.->|optional| LAW
+  AG --> MA
   KV --> KVS
-  LAW -.->|future| AG
-  PE -.->|planned| SNET
+  PE -.->|typical| SNET
 ```
 
-Solid lines reflect **implemented** modules and the `complete-landing-zone` example; dashed lines are **planned** links.
+Solid lines reflect common dependencies; many modules optionally send diagnostics to Log Analytics.
 
 ## Policies
 

@@ -1,3 +1,3 @@
 locals {
-  # Reserved for name construction and tag merging when implemented.
+  module_kind = "policy-assignment"
 }
