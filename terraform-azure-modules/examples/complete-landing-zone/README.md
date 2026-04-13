@@ -1,19 +1,31 @@
 # Example: complete-landing-zone (started)
 
-This v0.1 example provisions a **resource group** and a **Log Analytics workspace** using validated tags and CAF-style names.
+This example deploys a minimal **landing zone** in **UK South**:
 
-Later milestones will add networking, Key Vault, App Service, diagnostics to compute, and other components per the library build order.
+- Validated tags and CAF-style names
+- Resource group
+- Log Analytics workspace
+- Virtual network and subnet
+- Network security group (no inline rules in this sample) and subnet–NSG association
+- Diagnostic settings on VNet, subnet, and NSG to the Log Analytics workspace (where supported)
 
 ## Prerequisites
 
-Same as `examples/single-resource`: Terraform `>= 1.9.0`, Azure credentials, `subscription_id`.
+- Terraform `>= 1.9.0`
+- Azure credentials and `subscription_id` for the azurerm v4 provider
 
 ## Usage
 
-```bash
+```powershell
 cd examples/complete-landing-zone
 terraform init -backend=false
-terraform apply -var="subscription_id=YOUR_SUBSCRIPTION_ID"
+$env:TF_VAR_subscription_id = "<your-subscription-id>"
+terraform plan
+terraform apply
 ```
 
-Diagnostic settings from application or platform resources to Log Analytics will be added when the corresponding modules (web app, databases, etc.) are published.
+Uncomment `backend.tf` when using remote state.
+
+## Next steps
+
+Future milestones can add Key Vault, private endpoints, App Service or AKS, and database modules per the library build order.

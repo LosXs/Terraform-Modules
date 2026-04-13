@@ -12,18 +12,25 @@ module "tags" {
 
 | Status | Path | Description |
 |--------|------|-------------|
-| **Implemented (v0.1)** | `modules/_shared/tags` | Mandatory tag validation and outputs |
-| **Implemented (v0.1)** | `modules/_shared/naming` | CAF-style names and truncation |
-| **Implemented (v0.1)** | `modules/governance/resource-group` | Resource group |
-| **Implemented (v0.1)** | `modules/monitoring/log-analytics-workspace` | Log Analytics workspace |
-| **Implemented (v0.1)** | `modules/monitoring/diagnostic-setting` | Diagnostic settings wrapper |
+| **Implemented** | `modules/_shared/tags` | Mandatory tag validation and outputs |
+| **Implemented** | `modules/_shared/naming` | CAF-style names and truncation |
+| **Implemented** | `modules/governance/resource-group` | Resource group |
+| **Implemented** | `modules/monitoring/log-analytics-workspace` | Log Analytics workspace |
+| **Implemented** | `modules/monitoring/diagnostic-setting` | Diagnostic settings wrapper |
+| **Implemented** | `modules/identity-security/key-vault` | Key Vault (RBAC by default) |
+| **Implemented** | `modules/identity-security/key-vault-secret` | Key Vault secret |
+| **Implemented** | `modules/identity-security/role-assignment` | Azure RBAC role assignment |
+| **Implemented** | `modules/networking/virtual-network` | Virtual network |
+| **Implemented** | `modules/networking/subnet` | Subnet |
+| **Implemented** | `modules/networking/network-security-group` | NSG with inline rules |
+| **Implemented** | `modules/networking/route-table` | Route table with UDRs |
 | Scaffold | `modules/governance/management-group` | Planned |
 | Scaffold | `modules/governance/policy-assignment` | Planned |
-| Scaffold | `modules/networking/*` | Planned |
+| Scaffold | `modules/networking/private-endpoint`, `private-dns-zone` | Planned |
 | Scaffold | `modules/compute/*` | Planned |
 | Scaffold | `modules/storage/*` | Planned |
 | Scaffold | `modules/database/*` | Planned |
-| Scaffold | `modules/identity-security/*` | Planned |
+| Scaffold | `modules/identity-security/key-vault-key`, `user-assigned-identity` | Planned |
 | Scaffold | `modules/monitoring/action-group`, `monitor-alert` | Planned |
 | Scaffold | `modules/app-services/*` | Planned |
 | Scaffold | `modules/containers/*` | Planned |
@@ -35,7 +42,7 @@ Each module’s `docs/README.md` follows a standard layout (overview, Mermaid, u
 | Example | Status |
 |---------|--------|
 | `examples/single-resource` | **Ready** — tags, naming, resource group |
-| `examples/complete-landing-zone` | **Started (v0.1)** — adds Log Analytics workspace |
+| `examples/complete-landing-zone` | **Started** — RG, Log Analytics, VNet, subnet, NSG, association, diagnostics |
 | `examples/aks-workload` | Placeholder README only |
 | `examples/web-app-with-db` | Placeholder README only |
 
@@ -90,31 +97,44 @@ graph TD
     MA[monitor-alert]
   end
 
-  subgraph Networking[Networking — scaffold]
+  subgraph Networking_impl[Networking — implemented]
     VNET[virtual-network]
     SNET[subnet]
     NSG[network-security-group]
-    PE[private-endpoint]
-    PDNS[private-dns-zone]
     RT[route-table]
   end
 
-  subgraph Security[Identity — scaffold]
+  subgraph Networking_future[Networking — scaffold]
+    PE[private-endpoint]
+    PDNS[private-dns-zone]
+  end
+
+  subgraph Security_impl[Identity — implemented]
     KV[key-vault]
+    KVS[key-vault-secret]
     RBAC[role-assignment]
+  end
+
+  subgraph Security_future[Identity — scaffold]
     UAI[user-assigned-identity]
+    KVK[key-vault-key]
   end
 
   TAGS --> RG
   NAMING --> RG
   RG --> LAW
   TAGS --> LAW
-  DIAG -.->|optional on any supported resource| LAW
-  RG -.->|future| VNET
+  RG --> VNET
+  VNET --> SNET
+  SNET --> NSG
+  RG --> RT
+  DIAG -.->|optional| LAW
+  KV --> KVS
   LAW -.->|future| AG
+  PE -.->|planned| SNET
 ```
 
-Solid lines reflect the **v0.1** examples; dashed lines are **planned** links.
+Solid lines reflect **implemented** modules and the `complete-landing-zone` example; dashed lines are **planned** links.
 
 ## Policies
 
