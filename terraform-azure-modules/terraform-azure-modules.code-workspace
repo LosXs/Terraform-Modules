@@ -1,0 +1,11 @@
+{
+  "folders": [
+    {
+      "name": "terraform-azure-modules",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "terraform.experimentalFeatures.validateOnSave": true
+  }
+}

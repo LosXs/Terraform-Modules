@@ -66,6 +66,8 @@ Backend configuration belongs in **examples** (see commented `backend.tf` stubs)
 
 ## Validation
 
+**IDE (HashiCorp Terraform extension):** If you open the parent repo (`IaC-Modules`) as the workspace root, IntelliSense may show false errors on `module` blocks (for example “Unexpected attribute”) because the language server does not always resolve local `module` sources until it has indexed the right roots. For accurate diagnostics, open **`terraform-azure-modules/terraform-azure-modules.code-workspace`** (File → Open Workspace from File), or open the **`terraform-azure-modules`** folder as the workspace root. `terraform validate` in each example remains the source of truth.
+
 From `terraform-azure-modules/`:
 
 ```bash
