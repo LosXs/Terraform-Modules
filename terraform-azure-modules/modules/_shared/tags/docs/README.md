@@ -1,6 +1,6 @@
 # Shared tags (policy-aligned)
 
-> Validates the six mandatory organisational tags and optional additional tags against the same allowed values as Azure Policy, outputting a map ready for resource groups and resources.
+> Validates the six mandatory eSurv tags and optional additional tags against the same allowed values as Azure Policy, outputting a map ready for resource groups and resources.
 
 ## Overview
 
